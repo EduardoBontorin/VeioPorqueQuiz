@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prova de RFID UHF — Fundamentos e Prática</title>
+<meta name="description" content="Prova interativa sobre sistemas RFID UHF, baseada em GS1 e EPC Gen2. 15 questões mistas com correção automática.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a1628;
+    --bg-deep: #050d1c;
+    --grid: rgba(72, 169, 220, 0.08);
+    --grid-strong: rgba(72, 169, 220, 0.15);
+    --ink: #e8f1f8;
+    --ink-dim: #8aa9c5;
+    --ink-muted: #5a7993;
+    --accent: #f4923b;
+    --accent-soft: rgba(244, 146, 59, 0.12);
+    --cyan: #48a9dc;
+    --cyan-soft: rgba(72, 169, 220, 0.1);
+    --success: #4ade80;
+    --success-bg: rgba(74, 222, 128, 0.1);
+    --danger: #f87171;
+    --danger-bg: rgba(248, 113, 113, 0.1);
+    --warning: #fbbf24;
+    --warning-bg: rgba(251, 191, 36, 0.1);
+    --border: rgba(72, 169, 220, 0.2);
+    --border-strong: rgba(72, 169, 220, 0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      linear-gradient(var(--grid-strong) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-strong) 1px, transparent 1px);
+    background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+    background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
+  }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* === HEADER === */
+  header {
+    border-bottom: 1px solid var(--border);
+    background: rgba(5, 13, 28, 0.7);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .header-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-dim);
+    letter-spacing: 0.5px;
+  }
+
+  .brand-mark {
+    width: 28px;
+    height: 28px;
+    border: 1.5px solid var(--accent);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .brand-mark::before, .brand-mark::after {
+    content: '';
+    position: absolute;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+  }
+  .brand-mark::before { width: 8px; height: 8px; }
+  .brand-mark::after { width: 14px; height: 14px; opacity: 0.5; }
+
+  .header-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-muted);
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .header-meta span::before {
+    content: '◆ ';
+    color: var(--accent);
+    opacity: 0.6;
+  }
+
+  /* === HERO === */
+  .hero {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 80px 24px 60px;
+    position: relative;
+  }
+
+  .hero::before {
+    content: 'ENGINEERING BLUEPRINT';
+    position: absolute;
+    top: 60px;
+    left: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--cyan);
+    opacity: 0.7;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 24px 0 20px;
+    color: var(--ink);
+  }
+
+  .hero h1 .accent {
+    color: var(--accent);
+    position: relative;
+  }
+
+  .hero h1 .accent::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    bottom: -4px;
+    height: 2px;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  .hero .subtitle {
+    font-size: 1.1rem;
+    color: var(--ink-dim);
+    max-width: 600px;
+    margin-bottom: 32px;
+  }
+
+  .hero-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 40px;
+    max-width: 640px;
+  }
+
+  .meta-cell {
+    background: rgba(5, 13, 28, 0.6);
+    padding: 14px 18px;
+  }
+
+  .meta-cell .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .meta-cell .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .meta-cell .value .unit { color: var(--cyan); font-size: 12px; margin-left: 4px; }
+
+  .start-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 28px;
+    background: var(--accent);
+    color: var(--bg-deep);
+    border: none;
+    border-radius: 6px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .start-btn:hover {
+    background: #ffae5e;
+    transform: translateY(-1px);
+  }
+
+  .start-btn .arrow {
+    transition: transform 0.2s;
+  }
+
+  .start-btn:hover .arrow { transform: translateX(4px); }
+
+  /* === MAIN === */
+  main {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 48px 0 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-header .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 4px 10px;
+    border-radius: 3px;
+    border: 1px solid var(--accent);
+  }
+
+  .section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .section-header .info {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  /* === QUESTIONS === */
+  .question {
+    background: rgba(5, 13, 28, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .question:hover {
+    border-color: var(--border-strong);
+  }
+
+  .question::before {
+    content: attr(data-num);
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-muted);
+    letter-spacing: 1px;
+  }
+
+  .question .q-text {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+    color: var(--ink);
+    padding-right: 60px;
+  }
+
+  .q-text .num {
+    color: var(--accent);
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    margin-right: 8px;
+  }
+
+  /* Options (MC) */
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    margin: 8px 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: rgba(5, 13, 28, 0.4);
+  }
+
+  .option:hover {
+    border-color: var(--border-strong);
+    background: var(--cyan-soft);
+  }
+
+  .option input[type="radio"] {
+    margin-top: 4px;
+    flex-shrink: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .option input[type="radio"]:disabled { cursor: default; }
+
+  .option .opt-text {
+    flex: 1;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .option .opt-letter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-muted);
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .option.correct {
+    background: var(--success-bg);
+    border-color: var(--success);
+  }
+  .option.correct .opt-letter { color: var(--success); }
+
+  .option.incorrect {
+    background: var(--danger-bg);
+    border-color: var(--danger);
+  }
+  .option.incorrect .opt-letter { color: var(--danger); }
+
+  /* Textarea (essay) */
+  textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(5, 13, 28, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--ink);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14.5px;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 120px;
+    transition: border-color 0.15s;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  textarea::placeholder { color: var(--ink-muted); }
+  textarea:disabled { opacity: 0.7; cursor: default; }
+
+  /* Feedback */
+  .feedback {
+    display: none;
+    margin-top: 14px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    border-left: 3px solid;
+  }
+
+  .feedback.correct {
+    background: var(--success-bg);
+    border-color: var(--success);
+    color: #a7f3c2;
+  }
+
+  .feedback.incorrect {
+    background: var(--danger-bg);
+    border-color: var(--danger);
+    color: #fca5a5;
+  }
+
+  .feedback.info {
+    background: var(--cyan-soft);
+    border-color: var(--cyan);
+    color: var(--ink);
+  }
+
+  .feedback strong { color: var(--ink); display: block; margin-bottom: 6px; font-weight: 600; }
+  .feedback ul { margin: 8px 0; padding-left: 22px; }
+  .feedback li { margin: 4px 0; color: var(--ink-dim); }
+  .feedback em { color: var(--ink-dim); font-style: italic; }
+
+  /* Action bar */
+  .action-bar {
+    position: sticky;
+    bottom: 16px;
+    margin: 32px 0 0;
+    padding: 16px 20px;
+    background: rgba(5, 13, 28, 0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    z-index: 5;
+  }
+
+  .progress-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-dim);
+  }
+
+  .progress-info .count { color: var(--accent); font-weight: 600; }
+
+  .action-bar button {
+    padding: 12px 24px;
+    background: var(--accent);
+    color: var(--bg-deep);
+    border: none;
+    border-radius: 6px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .action-bar button:hover { background: #ffae5e; }
+  .action-bar button.secondary {
+    background: transparent;
+    color: var(--ink-dim);
+    border: 1px solid var(--border);
+  }
+  .action-bar button.secondary:hover { color: var(--ink); border-color: var(--border-strong); background: var(--cyan-soft); }
+
+  /* Result */
+  #result-area {
+    margin-top: 32px;
+    scroll-margin-top: 100px;
+  }
+
+  .result-card {
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 32px 28px;
+    background: rgba(5, 13, 28, 0.7);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+  }
+
+  .result-grade {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--ink-muted);
+    margin-bottom: 8px;
+  }
+
+  .result-score {
+    font-size: 3rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .result-score .total { color: var(--ink-muted); font-size: 1.5rem; }
+
+  .result-verdict {
+    font-size: 1.1rem;
+    color: var(--ink);
+    margin: 16px 0 8px;
+    font-weight: 500;
+  }
+
+  .result-detail {
+    font-size: 14px;
+    color: var(--ink-dim);
+  }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    margin-top: 80px;
+    padding: 32px 24px;
+    text-align: center;
+  }
+
+  footer .inner {
+    max-width: 980px;
+    margin: 0 auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  footer a {
+    color: var(--cyan);
+    text-decoration: none;
+  }
+
+  footer a:hover { color: var(--accent); }
+
+  /* Corner brackets — decorative */
+  .corner {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--accent);
+    opacity: 0.5;
+  }
+  .corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+  .corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+  .corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  /* Pre-start screen */
+  #quiz-container { display: none; }
+  #quiz-container.active { display: block; }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    .hero { padding: 60px 20px 40px; }
+    .hero::before { left: 20px; }
+    .header-inner { padding: 14px 20px; }
+    .header-meta { display: none; }
+    main { padding: 0 20px 60px; }
+    .question { padding: 20px; }
+    .q-text { padding-right: 40px; }
+    .action-bar { flex-direction: column; gap: 12px; align-items: stretch; }
+    .action-bar button { width: 100%; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .question { animation: fadeUp 0.4s ease backwards; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <span>RFID UHF · ENGINEERING BLUEPRINT</span>
+    </div>
+    <div class="header-meta">
+      <span>EPC GEN2</span>
+      <span>GS1</span>
+      <span class="mono">v1.0</span>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <h1>Prova de <span class="accent">Sistemas RFID UHF</span></h1>
+  <p class="subtitle">
+    Avaliação aplicada de fundamentos, arquitetura RF, integração de dados e implementação no mundo real.
+    Baseada na padronização global GS1 e especificações EPC Gen2.
+  </p>
+
+  <div class="hero-meta-grid">
+    <div class="meta-cell">
+      <div class="label">Questões</div>
+      <div class="value">15</div>
+    </div>
+    <div class="meta-cell">
+      <div class="label">Objetivas</div>
+      <div class="value">10<span class="unit">× 1pt</span></div>
+    </div>
+    <div class="meta-cell">
+      <div class="label">Dissertativas</div>
+      <div class="value">5<span class="unit">× 2pt</span></div>
+    </div>
+    <div class="meta-cell">
+      <div class="label">Total</div>
+      <div class="value">20<span class="unit">pts</span></div>
+    </div>
+  </div>
+
+  <button class="start-btn" onclick="startQuiz()">
+    Iniciar avaliação
+    <span class="arrow">→</span>
+  </button>
+</section>
+
+<main>
+  <div id="quiz-container">
+    <div id="quiz"></div>
+
+    <div class="action-bar" id="action-bar">
+      <div class="progress-info">
+        <span class="count" id="answered-count">0</span> / 15 respondidas
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="secondary" id="reset-btn" onclick="resetQuiz()" style="display:none;">Refazer</button>
+        <button id="submit-btn" onclick="grade()">Corrigir prova</button>
+      </div>
+    </div>
+
+    <div id="result-area"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="inner">
+    <span>Construído como material de estudo · RFID UHF Fundamentals</span>
+    <span>Padronização <a href="https://www.gs1.org/" target="_blank" rel="noopener">GS1</a> · <a href="https://www.gs1.org/standards/epc-rfid" target="_blank" rel="noopener">EPC Gen2</a></span>
+  </div>
+</footer>
+
+<script>
+const questions = [
+  {
+    type: 'mc',
+    section: 'Parte I — Objetivas',
+    q: 'Uma tag RFID UHF passiva não possui bateria. Qual princípio físico permite que ela responda ao leitor?',
+    options: [
+      'Indução magnética de campo próximo (NFC)',
+      'Retroespalhamento (backscatter) da energia irradiada pelo leitor',
+      'Modulação ativa via oscilador interno da tag',
+      'Reflexão óptica do sinal de RF'
+    ],
+    answer: 1,
+    explain: 'A tag passiva usa a energia irradiada pelo leitor para ligar o microchip e refletir a resposta de volta — esse é o princípio do retroespalhamento.'
+  },
+  {
+    type: 'mc',
+    q: 'No Brasil, a Anatel destina à RFID UHF as faixas:',
+    options: [
+      '865–868 MHz (banda ETSI)',
+      '902–907 MHz e 915,5–928 MHz',
+      '433 MHz (banda ISM global)',
+      '2,4 GHz (banda Wi-Fi)'
+    ],
+    answer: 1,
+    explain: 'A regulação Anatel libera 902–907 MHz e 915,5–928 MHz, com potência máxima de 30 dBm (1 W) no conector do leitor.'
+  },
+  {
+    type: 'mc',
+    q: 'Você precisa identificar caixas em uma esteira onde a orientação das tags varia (algumas em pé, outras deitadas). Qual antena escolher?',
+    options: [
+      'Linear horizontal — maior alcance',
+      'Linear vertical — melhor para metais',
+      'Circular — independe da orientação da tag',
+      'Isotrópica — radiação uniforme'
+    ],
+    answer: 2,
+    explain: 'Polarização circular divide a potência em dois eixos giratórios, lendo a tag em qualquer orientação. Perde ~3 dB de alcance, mas é o padrão quando a posição varia.'
+  },
+  {
+    type: 'mc',
+    q: 'Sobre as sessões EPC Gen2, qual afirmação é correta para uma aplicação de portal de expedição onde cada caixa deve ser lida uma única vez ao passar?',
+    options: [
+      'Usar S0 — sem persistência, leitura contínua',
+      'Usar S1 — persistência de 0,5 a 5 segundos',
+      'Usar S2 ou S3 — persistência longa (mín. 2s), tag adormece após leitura',
+      'Não importa, todas as sessões são equivalentes'
+    ],
+    answer: 2,
+    explain: 'S2/S3 têm persistência longa (mínimo 2s, podendo passar de 11s). A tag adormece após a leitura, evitando releituras redundantes — ideal para "ler uma vez" em grandes populações.'
+  },
+  {
+    type: 'mc',
+    q: 'Em uma tag Gen2, o banco de memória que armazena o identificador único do fabricante do chip (não regravável) é:',
+    options: [
+      'Banco Reservado (00)',
+      'Banco EPC (01)',
+      'Banco TID (10)',
+      'Banco de Usuário (11)'
+    ],
+    answer: 2,
+    explain: 'O Banco TID (10) guarda o Tag Identifier — 32 a 80 bits, impossível de reescrever. Garante singularidade e é excelente contra falsificações.'
+  },
+  {
+    type: 'mc',
+    q: 'O Frequency Hopping Spread Spectrum (FHSS) determina que o leitor não pode transmitir no mesmo canal por mais de:',
+    options: [
+      '0,1 segundo',
+      '0,4 segundo',
+      '1 segundo',
+      '5 segundos'
+    ],
+    answer: 1,
+    explain: 'A regra de tempo do FHSS é 0,4 s por canal, com salto entre até 50 canais — evita interferência entre múltiplos leitores na mesma área.'
+  },
+  {
+    type: 'mc',
+    q: 'Tag shadowing (sombreamento) ocorre quando:',
+    options: [
+      'A tag está em superfície metálica refletora',
+      'O leitor não tem linha de visão direta com a tag',
+      'Uma tag está diretamente na frente/atrás de outra, bloqueando a energia',
+      'A tag fica em contato com líquidos'
+    ],
+    answer: 2,
+    explain: 'Sombreamento é o bloqueio físico entre tags empilhadas. Mitigações: orientação alternada, movimento relativo e posicionamento escalonado (staggering).'
+  },
+  {
+    type: 'mc',
+    q: 'Qual estrutura GS1 deve ser usada para rastrear um palete inteiro em movimento como uma unidade logística agrupada?',
+    options: [
+      'GTIN — Global Trade Item Number',
+      'GLN — Global Location Number',
+      'SSCC — Serial Shipping Container Code',
+      'GIAI — Global Individual Asset Identifier'
+    ],
+    answer: 2,
+    explain: 'SSCC é a chave para agrupamentos logísticos de rastreabilidade (palete inteiro). GTIN identifica o produto, GLN a localização, GIAI ativos fixos.'
+  },
+  {
+    type: 'mc',
+    q: 'Em ambiente úmido (caixas com líquidos), o principal problema é a absorção do sinal pela água. Qual mitigação é recomendada?',
+    options: [
+      'Aumentar a potência do leitor acima de 30 dBm',
+      'Usar suportes com espuma ou espaçadores para afastar a tag do conteúdo úmido',
+      'Trocar para polarização linear de alto ganho',
+      'Usar tags de papel térmico direto'
+    ],
+    answer: 1,
+    explain: 'Espaçadores/espuma afastam a tag do líquido. Para metais usa-se tag "On-Metal" ou caixa de Faraday. Aumentar potência acima de 30 dBm viola a norma.'
+  },
+  {
+    type: 'mc',
+    q: 'Sobre o middleware RFID, qual NÃO é uma de suas funções essenciais?',
+    options: [
+      'Filtragem de leituras duplicadas para poupar o banco de dados',
+      'Padronização ALE para classificar dados brutos em eventos de negócio',
+      'Geração física das ondas de RF e modulação do sinal',
+      'Associação Tag-ID entre números de série e recipientes pai (palete/caixa)'
+    ],
+    answer: 2,
+    explain: 'A geração de RF é feita pelo hardware do leitor (PLL, amplificador, antena). O middleware é software que gerencia dispositivos, filtra, estrutura e integra com ERP/WMS.'
+  },
+  {
+    type: 'essay',
+    section: 'Parte II — Dissertativas',
+    q: 'Explique o framework S.O.A.P. de posicionamento de tags e dê um exemplo prático de aplicação de cada uma das 4 letras em um cenário de portal de expedição.',
+    rubric: [
+      'S (Size/Tamanho): tag maior = mais captação de energia = maior alcance',
+      'O (Orientation): avaliada via pitch (eixo X), yaw (eixo Y) e roll (eixo Z) — crítica em antenas lineares',
+      'A (Angle): a face da tag deve apontar diretamente para a antena; ler de lado reduz alcance drasticamente',
+      'P (Positioning): "ponto ideal" no item, depende do material (metal/líquidos) e da altura do centro de irradiação',
+      'Exemplo aplicado a portal de expedição (qualquer cenário concreto)'
+    ],
+    explain: 'Resposta esperada: descrever as 4 letras (Size, Orientation, Angle, Positioning) com um exemplo concreto — ex.: caixas de 60cm passando em palete, tag de 100x20mm (S), aplicada na lateral com a face apontando para a antena (A,P), em altura compatível com o centro de irradiação, e usando polarização circular para tolerar variações de orientação (O).'
+  },
+  {
+    type: 'essay',
+    q: 'Um cliente quer rastrear ferramentas industriais (chaves de torque) em um ambiente com bancadas metálicas. Liste pelo menos 3 desafios técnicos que você espera enfrentar e a mitigação para cada um.',
+    rubric: [
+      'Reflexão/multicaminho do metal (interferência construtiva/destrutiva, pontos mortos) → tag On-Metal',
+      'Tag direto em metal sem espaçador desafina a antena → tag On-Metal ou espaçador/foam',
+      'Sombreamento entre ferramentas empilhadas → orientação alternada / staggering',
+      'Superfície curva/pequena reduzindo área de contato adesivo → fixação por parafuso/rebite ou amarra',
+      'GIAI como identificador GS1 apropriado para ativos fixos'
+    ],
+    explain: 'Resposta esperada combina interferência por metal, sombreamento, engenharia de fixação (superfícies curvas exigem métodos avançados como parafuso/rebite/amarra) e GIAI para ativos. Tags "On-Metal" usam o metal como extensor de antena em vez de sofrer com ele.'
+  },
+  {
+    type: 'essay',
+    q: 'Diferencie "Faixa de Leitura" (Read Range) de "Zona de Leitura" (Read Zone) e explique por que um piloto em laboratório raramente representa o desempenho em produção.',
+    rubric: [
+      'Faixa de Leitura: intervalo ideal hipotético (teórico, baseado em ganho/potência)',
+      'Zona de Leitura: realidade tridimensional moldada pelo ambiente (metal, líquidos, multicaminho)',
+      'Laboratório não tem as interferências do ambiente real (reflexões, absorção, sombreamento, atenuação de hardware)',
+      'Por isso é necessário comissionamento/mapeamento no local de instalação'
+    ],
+    explain: 'Resposta esperada: distinguir o ideal teórico (faixa) da realidade tridimensional (zona) e citar fatores reais que distorcem a zona: absorção por líquidos, reflexão por metais, atenuação por cabos longos e multiplexadores (~1 dB cada).'
+  },
+  {
+    type: 'essay',
+    q: 'Você precisa codificar 50.000 tags por semana para um cliente. Compare impressão térmica direta vs. transferência térmica e justifique qual escolheria considerando que as etiquetas ficarão expostas em ambiente externo (sol, chuva, abrasão).',
+    rubric: [
+      'Térmica direta: papel especial escurece com calor, sem ribbon, custo baixo, MAS degrada com UV/calor/tempo',
+      'Transferência térmica: ribbon derrete tinta na etiqueta, durável contra luz/temperatura/abrasão química',
+      'Tipos de ribbon: cera (papel), cera/resina (polímero, abrasão moderada), resina (química/abrasão alta)',
+      'Escolha justificada: transferência térmica com ribbon de resina (ou cera/resina) para ambiente externo',
+      'Capacidade: impressoras massificam ~9.600 tags/dia vs 1.440 manuais — 50k/semana é viável'
+    ],
+    explain: 'A escolha correta é transferência térmica com ribbon de resina, dada a exposição ambiental. Térmica direta degradaria em semanas sob UV/chuva. A capacidade de ~9.600 tags/dia atende 50k/semana com folga.'
+  },
+  {
+    type: 'essay',
+    q: 'Em um portal de expedição com 2 antenas lineares de alto ganho operando próximas, alguns leitores estão lendo tags do portal vizinho ("leitura cruzada"). Quais ajustes de hardware e software você faria para resolver?',
+    rubric: [
+      'Reduzir potência de transmissão (Tx) e/ou ajustar sensibilidade de recepção (Rx) do leitor',
+      'Usar polarização ou orientação de antena para direcionar o feixe (cone direcional, menor área de cobertura)',
+      'Aproveitar o FHSS — leitores em canais diferentes; coordenar saltos para evitar colisão',
+      'Filtragem no middleware: descartar leituras fora da zona esperada / com RSSI abaixo de threshold',
+      'Controle de zonas — confinamento físico em RF (caixas de Faraday parciais, blindagem)'
+    ],
+    explain: 'Resposta esperada combina hardware (potência Tx, Rx, ganho/direcionalidade da antena, FHSS, blindagem) e software (filtragem por RSSI/zona no middleware).'
+  }
+];
+
+const STORAGE_KEY = 'rfid_quiz_state_v1';
+let state = { answers: {}, submitted: false };
+
+function startQuiz() {
+  document.getElementById('quiz-container').classList.add('active');
+  document.querySelector('.hero').style.display = 'none';
+  buildQuiz();
+  setTimeout(() => {
+    document.getElementById('quiz-container').scrollIntoView({ behavior: 'smooth' });
+  }, 50);
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state = JSON.parse(raw);
+  } catch(e) {}
+}
+
+function buildQuiz() {
+  const quizDiv = document.getElementById('quiz');
+  quizDiv.innerHTML = '';
+
+  let mcIndex = 0;
+  let essayIndex = 0;
+
+  questions.forEach((item, idx) => {
+    if (item.section) {
+      const h = document.createElement('div');
+      h.className = 'section-header';
+      h.innerHTML = `
+        <span class="tag">${item.section.includes('Objetivas') ? 'PARTE I' : 'PARTE II'}</span>
+        <h2>${item.section.split('— ')[1]}</h2>
+        <span class="info">${item.section.includes('Objetivas') ? '10 questões · 1 ponto cada' : '5 questões · 2 pontos cada'}</span>
+      `;
+      quizDiv.appendChild(h);
+    }
+
+    const wrap = document.createElement('div');
+    wrap.className = 'question';
+    wrap.dataset.idx = idx;
+    wrap.style.animationDelay = (idx * 0.03) + 's';
+
+    let displayNum;
+    if (item.type === 'mc') { mcIndex++; displayNum = `Q${String(mcIndex).padStart(2, '0')}`; }
+    else { essayIndex++; displayNum = `D${String(essayIndex).padStart(2, '0')}`; }
+    wrap.dataset.num = displayNum;
+
+    const qText = document.createElement('div');
+    qText.className = 'q-text';
+    qText.innerHTML = `<span class="num">${idx + 1}.</span>${item.q}`;
+    wrap.appendChild(qText);
+
+    if (item.type === 'mc') {
+      const letters = ['A', 'B', 'C', 'D', 'E'];
+      item.options.forEach((opt, oi) => {
+        const lbl = document.createElement('label');
+        lbl.className = 'option';
+        lbl.innerHTML = `
+          <input type="radio" name="q${idx}" value="${oi}" ${state.answers[idx] == oi ? 'checked' : ''}>
+          <span class="opt-letter">${letters[oi]}</span>
+          <span class="opt-text">${opt}</span>
+        `;
+        lbl.querySelector('input').addEventListener('change', () => {
+          state.answers[idx] = oi;
+          saveState();
+          updateProgress();
+        });
+        wrap.appendChild(lbl);
+      });
+    } else {
+      const ta = document.createElement('textarea');
+      ta.name = `q${idx}`;
+      ta.placeholder = 'Sua resposta...';
+      ta.value = state.answers[idx] || '';
+      ta.addEventListener('input', () => {
+        state.answers[idx] = ta.value;
+        saveState();
+        updateProgress();
+      });
+      wrap.appendChild(ta);
+    }
+
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback';
+    wrap.appendChild(feedback);
+
+    quizDiv.appendChild(wrap);
+  });
+
+  updateProgress();
+
+  if (state.submitted) grade(true);
+}
+
+function updateProgress() {
+  let count = 0;
+  questions.forEach((item, idx) => {
+    if (item.type === 'mc' && state.answers[idx] !== undefined) count++;
+    else if (item.type === 'essay' && state.answers[idx] && state.answers[idx].trim().length > 0) count++;
+  });
+  document.getElementById('answered-count').textContent = count;
+}
+
+function grade(silent = false) {
+  let mcCorrect = 0;
+  let mcTotal = 0;
+
+  const quizDiv = document.getElementById('quiz');
+
+  questions.forEach((item, idx) => {
+    const wrap = quizDiv.querySelector(`[data-idx="${idx}"]`);
+    if (!wrap) return;
+    const feedback = wrap.querySelector('.feedback');
+
+    if (item.type === 'mc') {
+      mcTotal++;
+      const chosen = state.answers[idx];
+      const chosenVal = chosen !== undefined ? parseInt(chosen) : -1;
+      const isCorrect = chosenVal === item.answer;
+      if (isCorrect) mcCorrect++;
+
+      wrap.querySelectorAll('.option').forEach((lbl, li) => {
+        if (li === item.answer) lbl.classList.add('correct');
+        else if (li === chosenVal && !isCorrect) lbl.classList.add('incorrect');
+        lbl.querySelector('input').disabled = true;
+      });
+
+      feedback.style.display = 'block';
+      feedback.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+      feedback.innerHTML = `<strong>${isCorrect ? '✓ Correto' : '✗ Incorreto'}</strong>${item.explain}`;
+    } else {
+      const ta = wrap.querySelector('textarea');
+      ta.disabled = true;
+      const answer = state.answers[idx] || '';
+      const answered = answer.trim().length > 20;
+      feedback.style.display = 'block';
+      feedback.className = 'feedback info';
+      let html = '<strong>Gabarito esperado (autoavaliação):</strong><ul>';
+      item.rubric.forEach(r => { html += `<li>${r}</li>`; });
+      html += '</ul>';
+      html += `<em>${item.explain}</em>`;
+      if (!answered) {
+        html = '<strong style="color: var(--warning);">⚠ Resposta muito curta ou em branco</strong>' + html;
+      }
+      feedback.innerHTML = html;
+    }
+  });
+
+  state.submitted = true;
+  saveState();
+
+  const pct = Math.round((mcCorrect / mcTotal) * 100);
+  const resultArea = document.getElementById('result-area');
+
+  let verdict = '', detail = '', accentColor = 'var(--accent)';
+  if (pct >= 80) {
+    verdict = 'Excelente — domínio sólido dos fundamentos';
+    detail = 'Você está pronto para discutir arquitetura e dimensionar implantações reais.';
+    accentColor = 'var(--success)';
+  } else if (pct >= 60) {
+    verdict = 'Bom — revisar os pontos errados';
+    detail = 'Boa base conceitual. Aprofunde nos itens marcados em vermelho antes de prosseguir.';
+    accentColor = 'var(--cyan)';
+  } else if (pct >= 40) {
+    verdict = 'Razoável — recomendo revisar os fundamentos';
+    detail = 'Foco especial em: sessões EPC Gen2, framework S.O.A.P. e mitigação de interferência.';
+    accentColor = 'var(--warning)';
+  } else {
+    verdict = 'Estudar novamente os fundamentos antes de seguir';
+    detail = 'Recomendo revisar todo o material da apresentação antes de tentar de novo.';
+    accentColor = 'var(--danger)';
+  }
+
+  resultArea.innerHTML = `
+    <div class="result-card" style="--accent: ${accentColor};">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+      <div class="result-grade">RESULTADO · OBJETIVAS</div>
+      <div class="result-score" style="color: ${accentColor};">${mcCorrect}<span class="total">/${mcTotal}</span></div>
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink-muted);">${pct}% de aproveitamento</div>
+      <div class="result-verdict">${verdict}</div>
+      <div class="result-detail">${detail} As 5 dissertativas exigem autoavaliação pelo gabarito acima.</div>
+    </div>
+  `;
+  resultArea.querySelector('.result-card').style.borderTop = `3px solid ${accentColor}`;
+
+  document.getElementById('submit-btn').style.display = 'none';
+  document.getElementById('reset-btn').style.display = 'inline-flex';
+
+  if (!silent) {
+    setTimeout(() => {
+      resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  }
+}
+
+function resetQuiz() {
+  if (!confirm('Tem certeza? Suas respostas serão apagadas.')) return;
+  state = { answers: {}, submitted: false };
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  document.getElementById('result-area').innerHTML = '';
+  document.getElementById('submit-btn').style.display = 'inline-flex';
+  document.getElementById('reset-btn').style.display = 'none';
+  buildQuiz();
+  document.getElementById('quiz').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Init
+loadState();
+if (state.submitted || Object.keys(state.answers).length > 0) {
+  document.getElementById('quiz-container').classList.add('active');
+  document.querySelector('.hero').style.display = 'none';
+  buildQuiz();
+}
+</script>
+</body>
+</html>
